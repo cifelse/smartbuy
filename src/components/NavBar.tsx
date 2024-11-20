@@ -1,5 +1,6 @@
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function NavBar({ isMobile }: Readonly<{ isMobile: boolean }>) {
     return (
@@ -10,8 +11,12 @@ export default function NavBar({ isMobile }: Readonly<{ isMobile: boolean }>) {
                 <h1 className="text-2xl font-bold">SmartBuy</h1>
             </div>
             <div className="flex gap-2 md:gap-4">
-                <Button variant="default" size={isMobile ? "sm" : "default"}>Log In</Button>
-                <Button variant="outline" size={isMobile ? "sm" : "default"}>Be a Seller</Button>
+                <Link href="/login" passHref>
+                    <Button variant="default" size={isMobile ? "sm" : "default"}>Log In</Button>
+                </Link>
+                <Link href="/login" passHref>
+                    <Button variant="outline" size={isMobile ? "sm" : "default"}>Be a Seller</Button>
+                </Link>
             </div>
             </div>
         </header>
