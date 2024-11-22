@@ -74,6 +74,9 @@ export default function ProductCard({ product }: { product: Product }) {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
+              <Link href={`/products/${product.id}`} passHref>
+                <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-16 h-16" aria-label="View product details" />
+              </Link>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -91,7 +94,6 @@ export default function ProductCard({ product }: { product: Product }) {
                     role="button"
                     tabIndex={0}
                     onClick={() => setCurrentImageIndex(index)}
-                    onKeyPress={(e) => e.key === 'Enter' && setCurrentImageIndex(index)}
                     aria-label={`Go to image ${index + 1}`}
                   />
                 ))}
