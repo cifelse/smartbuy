@@ -29,7 +29,7 @@ export const getAllProducts = async () => {
     return data;
 }
 
-export const getProductById = async (id) => {
+export const getProduct = async (id) => {
     const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -38,6 +38,21 @@ export const getProductById = async (id) => {
 
     if (error) {
         console.error('Error fetching product', error);
+        return null;
+    }
+
+    return data;
+}
+
+export const getUser = async (id) => {
+    const { data, error } = await supabase
+        .from('users')
+        .select('first_name, last_name, pfp')
+        .eq('id', id)
+        .maybeSingle();
+
+    if (error) {
+        console.error('Error fetching user', error);
         return null;
     }
 

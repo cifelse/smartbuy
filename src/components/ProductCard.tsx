@@ -109,8 +109,8 @@ export default function ProductCard({ product }: { product: Product }) {
             <span className="text-sm">{product.rating.toFixed(1)}</span>
           </div>
         </div>
-        <Link href="/signup" passHref>
-          <Button variant="ghost" size="icon" className="rounded-full relative" aria-label="Add to cart">
+        <Link href={`/products/${product.id}`} passHref>
+          <Button variant="ghost" size="icon" className="rounded-full relative" aria-label="View product details">
             <ShoppingCart className="h-5 w-5" />
             <Plus className="h-3 w-3 absolute -top-1 -right-1 bg-white rounded-full" />
           </Button>
