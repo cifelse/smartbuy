@@ -10,11 +10,10 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import NavBar from '@/components/NavBar'
 
-// Initialize Supabase client
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-)
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY || ""
+);
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -37,10 +36,10 @@ export default function SignUp() {
   }
 
   const validatePassword = (password: string): boolean => {
-    const minLength = 12
-    const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/
-    return password.length >= minLength && complexityRegex.test(password)
-  }
+    const minLength = 9; // Match this to your error message
+    const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    return password.length >= minLength && complexityRegex.test(password);
+  };  
 
   const onSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault()
@@ -51,7 +50,7 @@ export default function SignUp() {
 
     // Basic validations
     if (!validatePassword(password)) {
-      setError('Password must be at least 12 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.')
+      setError('Password must be at least 9 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.')
       setIsLoading(false)
       return
     }
