@@ -85,7 +85,7 @@ export default function Login() {
 
     setIsLoading(false);
     alert(`Welcome back! Last login was: ${lastLogin ? new Date(lastLogin).toLocaleString() : "First time login."}`);
-    router.push('/');
+    router.push('/products/[id]');
   }
 
   return (
