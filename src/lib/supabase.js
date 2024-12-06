@@ -52,7 +52,7 @@ export const getProduct = async (id) => {
 
 export const getUser = async (id) => {
   const { data, error } = await supabase
-    .from("users")
+    .from("sellers")
     .select("first_name, last_name, pfp")
     .eq("id", id)
     .maybeSingle();
