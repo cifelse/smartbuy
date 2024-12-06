@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import { useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,50 +8,47 @@ import { Label } from "@/components/ui/label";
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_KEY || ""
-);
-
 export default function ProfilePage() {
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [password, setPassword] = useState("");
+  // Dummy user data and password
+  const dummyUser = {
+    username: "johndoe",
+    email: "johndoe@example.com",
+    first_name: "John",
+    last_name: "Doe",
+    old_password: "DummyOldPassword123!", // Dummy old password
+  };
+
+  const [user] = useState(dummyUser); // Using dummy user
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data.user) {
-        router.push("/login"); // Redirect if not logged in
-        return;
-      }
-
-      const { data: userInfo } = await supabase
-        .from("users")
-        .select("username, email, first_name, last_name")
-        .eq("id", data.user.id)
-        .single();
-
-      setUser(userInfo || null);
-    };
-
-    fetchUser();
-  }, [router]);
-
-  const handlePasswordUpdate = async () => {
+  const handlePasswordUpdate = () => {
     setError(null);
     setSuccess(null);
 
-    if (password !== confirmPassword) {
+    // Check if the old password matches
+    if (oldPassword !== user.old_password) {
+      setError("Old password is incorrect.");
+      return;
+    }
+
+    // Validate new password strength
+    if (newPassword !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[@$!%*?&]/.test(password)) {
+    if (
+      newPassword.length < 12 ||
+      !/[A-Z]/.test(newPassword) ||
+      !/[a-z]/.test(newPassword) ||
+      !/\d/.test(newPassword) ||
+      !/[@$!%*?&]/.test(newPassword)
+    ) {
       setError(
         "Password must be at least 12 characters long, and include uppercase, lowercase, a number, and a special character."
       );
@@ -61,14 +56,12 @@ export default function ProfilePage() {
     }
 
     setIsLoading(true);
-    const { error } = await supabase.auth.updateUser({ password });
 
-    if (error) {
-      setError("Failed to update password. Try again later.");
-    } else {
+    // Simulate a delay for password update
+    setTimeout(() => {
+      setIsLoading(false);
       setSuccess("Password updated successfully!");
-    }
-    setIsLoading(false);
+    }, 1000);
   };
 
   return (
@@ -121,16 +114,25 @@ export default function ProfilePage() {
 
                 {/* Password Update */}
                 <div>
+                  <Label>Old Password</Label>
+                  <Input
+                    type="password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    placeholder="Enter old password"
+                  />
+                </div>
+                <div>
                   <Label>New Password</Label>
                   <Input
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password"
                   />
                 </div>
                 <div>
-                  <Label>Confirm Password</Label>
+                  <Label>Confirm New Password</Label>
                   <Input
                     type="password"
                     value={confirmPassword}
