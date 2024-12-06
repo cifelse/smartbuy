@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import NavBar from '@/components/NavBar'
+import bcrypt from 'bcryptjs' // Import bcrypt
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -36,63 +37,68 @@ export default function SignUp() {
   }
 
   const validatePassword = (password: string): boolean => {
-    const minLength = 9; // Match this to your error message
+    const minLength = 9;
     const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
     return password.length >= minLength && complexityRegex.test(password);
-  };  
+  };
 
   const onSubmit = async (event: React.SyntheticEvent) => {
-    event.preventDefault()
-    setError(null)
-    setIsLoading(true)
+    event.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
-    const { username, email, firstName, lastName, password, confirmPassword, securityQuestion, securityAnswer } = formData
+    const { username, email, firstName, lastName, password, confirmPassword, securityQuestion, securityAnswer } = formData;
 
     // Basic validations
     if (!validatePassword(password)) {
-      setError('Password must be at least 9 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.')
-      setIsLoading(false)
-      return
+      setError('Password must be at least 9 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.');
+      setIsLoading(false);
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.')
-      setIsLoading(false)
-      return
+      setError('Passwords do not match.');
+      setIsLoading(false);
+      return;
     }
 
     if (!securityQuestion || !securityAnswer.trim()) {
-      setError('Please select a security question and provide an answer.')
-      setIsLoading(false)
-      return
+      setError('Please select a security question and provide an answer.');
+      setIsLoading(false);
+      return;
     }
 
-    // Save to Supabase
     try {
+      // Hash the password and security answer
+      const hashedPassword = await bcrypt.hash(password, 10); // Use bcrypt to hash the password
+      const hashedAnswer = await bcrypt.hash(securityAnswer, 10); // Use bcrypt to hash the security answer
+
+      // Save to Supabase
       const { error: supabaseError } = await supabase.from('users').insert({
         username,
         email,
         first_name: firstName,
         last_name: lastName,
-        password, // Ideally hash the password before storing
+        password: hashedPassword, // Store the hashed password
         security_question: securityQuestion,
-        security_answer: securityAnswer,
-      })
+        security_answer: hashedAnswer, // Store the hashed security answer
+      });
 
       if (supabaseError) {
-        setError('Error saving user data. Please try again later.')
-        console.error(supabaseError)
-        setIsLoading(false)
-        return
+        console.error('Supabase error:', supabaseError); // Log specific Supabase error
+        setError('Error saving user data. Please try again later.');
+        setIsLoading(false);
+        return;
       }
 
       // Navigate to success or login page
-      setIsLoading(false)
-      router.push('/login')
+      setIsLoading(false);
+      router.push('/login');
     } catch (err) {
-      setError('An unexpected error occurred.')
-      console.error(err)
-      setIsLoading(false)
+      // Log more detailed error information
+      console.error('Unexpected error:', err);
+      setError('An unexpected error occurred.');
+      setIsLoading(false);
     }
   }
 
